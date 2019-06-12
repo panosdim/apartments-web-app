@@ -1,26 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useGlobal, setGlobal } from 'reactn';
 import './App.css';
+import { Main, Login } from './pages';
+import { Spinner, Intent } from '@blueprintjs/core';
+
+// TODO: Change to production REST API
+axios.defaults.baseURL = 'http://api.moneytrack.cc.nf/';
+axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+
+setGlobal({
+    isLoggedIn: false,
+});
 
 const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    const [isLoggedIn, setLoggedIn] = useGlobal('isLoggedIn');
+    const [isLoading, setLoading] = useState(true);
+
+    React.useEffect(() => {
+        axios
+            .get('user')
+            .then(response => {
+                setLoggedIn(true);
+                setLoading(false);
+            })
+            .catch(error => {
+                setLoggedIn(false);
+                setLoading(false);
+            });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    return (
+        <>
+            {isLoading ? (
+                <div className='center'>
+                    <Spinner intent={Intent.PRIMARY} size={100} />
+                </div>
+            ) : isLoggedIn ? (
+                <Main />
+            ) : (
+                <Login />
+            )}
+        </>
+    );
+};
 
 export default App;
