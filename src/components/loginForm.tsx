@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 
 import axios from 'axios';
-import { setGlobal } from 'reactn';
+import { useGlobal } from 'reactn';
 import { FormGroup, InputGroup, Button, Tooltip, Intent } from '@blueprintjs/core';
-import { AppToaster } from '.';
-import useForm from './useForm';
+import { AppToaster, useForm } from '.';
 
 export const LoginForm = () => {
+    const [, setLoggedIn] = useGlobal('isLoggedIn');
+    const [, setUser] = useGlobal('user');
     const [isLoading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -19,7 +20,8 @@ export const LoginForm = () => {
                 localStorage.setItem('token', response.data.token);
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
                 setLoading(false);
-                setGlobal({ isLoggedIn: true });
+                setLoggedIn(true);
+                setUser(response.data.user);
             })
             .catch(() => {
                 AppToaster.show({
@@ -87,7 +89,7 @@ export const LoginForm = () => {
                     required
                 />
             </FormGroup>
-            <Button icon='log-in' intent={Intent.PRIMARY} loading={isLoading} text='Log in' type='submit' />
+            <Button icon='log-in' intent={Intent.PRIMARY} loading={isLoading} text='Login' type='submit' />
         </form>
     );
 };

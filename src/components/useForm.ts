@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const useForm = (callback: () => void) => {
+export const useForm = (callback: () => void) => {
     const [values, setValues] = useState<FormData>({});
     const [errors, setErrors] = useState<FormData>({});
 
@@ -32,5 +32,3 @@ const useForm = (callback: () => void) => {
 };
 
 export type FormData = { [key: string]: string };
-
-export default useForm;

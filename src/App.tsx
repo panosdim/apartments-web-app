@@ -6,15 +6,17 @@ import { Main, Login } from './pages';
 import { Spinner, Intent } from '@blueprintjs/core';
 
 // TODO: Change to production REST API
-axios.defaults.baseURL = 'http://api.moneytrack.cc.nf/';
+axios.defaults.baseURL = 'http://localhost:8000/';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
 setGlobal({
     isLoggedIn: false,
+    user: {},
 });
 
 const App: React.FC = () => {
     const [isLoggedIn, setLoggedIn] = useGlobal('isLoggedIn');
+    const [, setUser] = useGlobal('user');
     const [isLoading, setLoading] = useState(true);
 
     React.useEffect(() => {
@@ -23,8 +25,9 @@ const App: React.FC = () => {
             .then(response => {
                 setLoggedIn(true);
                 setLoading(false);
+                setUser(response.data);
             })
-            .catch(error => {
+            .catch(() => {
                 setLoggedIn(false);
                 setLoading(false);
             });
