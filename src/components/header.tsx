@@ -19,7 +19,7 @@ export const Header: React.FC = () => {
                 <Navbar.Heading>Apartments Management</Navbar.Heading>
             </Navbar.Group>
             <Navbar.Group align={Alignment.RIGHT}>
-                <Navbar.Heading>{user.first_name + ' ' + user.last_name}</Navbar.Heading>
+                <Navbar.Heading>{user.firstName + ' ' + user.lastName}</Navbar.Heading>
                 <Navbar.Divider />
                 <Button icon='log-out' intent={Intent.DANGER} text='Logout' onClick={logout} />
             </Navbar.Group>

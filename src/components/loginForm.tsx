@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useGlobal } from 'reactn';
 import { FormGroup, InputGroup, Button, Tooltip, Intent } from '@blueprintjs/core';
@@ -9,6 +9,16 @@ export const LoginForm = () => {
     const [, setUser] = useGlobal('user');
     const [isLoading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [isAuthenticated, setAuthenticated] = useState(false);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            setLoggedIn(true);
+        }
+
+        return () => setAuthenticated(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAuthenticated]);
 
     const login = () => {
         setLoading(true);
@@ -20,7 +30,7 @@ export const LoginForm = () => {
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
                 setLoading(false);
                 setUser(response.data.user);
-                setLoggedIn(true);
+                setAuthenticated(true);
             })
             .catch(() => {
                 AppToaster.show({

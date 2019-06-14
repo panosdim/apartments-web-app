@@ -12,6 +12,7 @@ axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getIte
 setGlobal({
     isLoggedIn: false,
     user: {},
+    selectedFlat: {},
 });
 
 const App: React.FC = () => {

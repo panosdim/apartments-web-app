@@ -7,5 +7,6 @@ declare module 'reactn/default' {
         isLoggedIn: boolean;
         user: UserType;
         flats: FlatType[];
+        selectedFlat: FlatType;
     }
 }
