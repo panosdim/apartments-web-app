@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import axios from 'axios';
 import { useGlobal } from 'reactn';
 import { FormGroup, InputGroup, Button, Tooltip, Intent } from '@blueprintjs/core';
@@ -20,8 +19,8 @@ export const LoginForm = () => {
                 localStorage.setItem('token', response.data.token);
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
                 setLoading(false);
-                setLoggedIn(true);
                 setUser(response.data.user);
+                setLoggedIn(true);
             })
             .catch(() => {
                 AppToaster.show({
