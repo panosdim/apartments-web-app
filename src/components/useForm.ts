@@ -3,9 +3,24 @@ import { useState } from 'react';
 export const useForm = (callback: () => void) => {
     const [values, setValues] = useState<FormData>({});
     const [errors, setErrors] = useState<FormData>({});
+    const [formRef, setRef] = useState<React.Ref<HTMLFormElement>>(null);
 
     const handleSubmit = (event: React.FormEvent) => {
         if (event) event.preventDefault();
+        let form = (formRef as unknown) as HTMLFormElement;
+        let tempErrors: FormData = {};
+        if (formRef && !form.checkValidity()) {
+            form.querySelectorAll(':invalid').forEach(element => {
+                const el = element as HTMLInputElement;
+                if (!el.validity.valid) {
+                    tempErrors = { ...tempErrors, [el.name]: el.validationMessage };
+                } else {
+                    let { [el.name]: omit, ...res } = tempErrors;
+                    tempErrors = res;
+                }
+            });
+            setErrors(tempErrors);
+        }
         if (Object.keys(errors).length === 0) {
             callback();
         }
@@ -28,6 +43,9 @@ export const useForm = (callback: () => void) => {
         handleSubmit,
         values,
         errors,
+        setValues,
+        setErrors,
+        setRef,
     };
 };
 

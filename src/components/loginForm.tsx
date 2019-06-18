@@ -41,7 +41,8 @@ export const LoginForm = () => {
             });
     };
 
-    const { values, errors, handleChange, handleSubmit } = useForm(login);
+    const { values, errors, handleChange, handleSubmit, setRef } = useForm(login);
+    const loginFormRef = setRef as React.Ref<HTMLFormElement>;
 
     const handleLockClick = () => setShowPassword(!showPassword);
 
@@ -57,7 +58,7 @@ export const LoginForm = () => {
     );
 
     return (
-        <form onSubmit={handleSubmit} noValidate>
+        <form onSubmit={handleSubmit} noValidate ref={loginFormRef}>
             <FormGroup
                 label='Email'
                 labelFor='email-input'
