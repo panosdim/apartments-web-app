@@ -15,7 +15,7 @@ import {
     Popover,
     Position,
 } from '@blueprintjs/core';
-import { useGlobal } from 'reactn';
+import { useGlobal, setGlobal } from 'reactn';
 import axios from 'axios';
 import { FlatType } from '../model';
 import { AppToaster, useForm } from '.';
@@ -46,25 +46,46 @@ export const Flats: React.FC = () => {
     }, []);
 
     const handleFlat = () => {
-        console.log('Submitted');
+        setLoading(true);
+        const method = isNew ? 'post' : 'put';
+        const url = isNew ? 'flat' : `flat/${selectedFlat.id}`;
 
-        // setLoading(true);
-        // axios
-        //     .post('login', values)
-        //     .then(response => {
-        //         localStorage.setItem('token', response.data.token);
-        //         axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
-        //         setLoading(false);
-        //         setUser(response.data.user);
-        //         setAuthenticated(true);
-        //     })
-        //     .catch(() => {
-        //         AppToaster.show({
-        //             intent: Intent.DANGER,
-        //             message: 'Login error. Please check your email or password.',
-        //         });
-        //         setLoading(false);
-        //     });
+        // Check if values changed
+
+        axios({
+            method: method,
+            url: url,
+            data: values,
+        })
+            .then(response => {
+                isNew
+                    ? setFlats([...flats, response.data])
+                    : setFlats(flats.map(flt => (flt.id === selectedFlat.id ? response.data : flt)));
+                setLoading(false);
+                setSelectedFlat(response.data);
+                AppToaster.show({
+                    intent: Intent.SUCCESS,
+                    message: 'Flat saved successfully.',
+                });
+                handleClose();
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 400) {
+                    // JWT Token expired
+                    setLoading(false);
+                    setGlobal({ isLoggedIn: false });
+                    AppToaster.show({
+                        intent: Intent.DANGER,
+                        message: error.response.data.error,
+                    });
+                } else {
+                    AppToaster.show({
+                        intent: Intent.DANGER,
+                        message: 'Fail to save Flat',
+                    });
+                    setLoading(false);
+                }
+            });
     };
 
     const { values, errors, handleChange, handleSubmit, setValues, setErrors, setRef } = useForm(handleFlat);
@@ -91,6 +112,16 @@ export const Flats: React.FC = () => {
     };
     const deleteFlat = () => {
         console.log('DELETE FLAT');
+    };
+
+    const handleValueChange = (_valueAsNumber: number, valueAsString: string) => {
+        if (valueAsString) {
+            setValues({ ...values, floor: valueAsString });
+            let { floor: omit, ...res } = errors;
+            setErrors(res);
+        } else {
+            setErrors({ ...errors, floor: 'Please fill out this field.' });
+        }
     };
 
     const popoverContent = (
@@ -209,7 +240,7 @@ export const Flats: React.FC = () => {
                                 id='floor-input'
                                 name='floor'
                                 placeholder='Floor'
-                                onChange={handleChange}
+                                onValueChange={handleValueChange}
                                 value={values.floor || ''}
                                 intent={errors.floor ? Intent.DANGER : values.floor ? Intent.SUCCESS : Intent.NONE}
                                 required

@@ -9,6 +9,7 @@ export const useForm = (callback: () => void) => {
         if (event) event.preventDefault();
         let form = (formRef as unknown) as HTMLFormElement;
         let tempErrors: FormData = {};
+
         if (formRef && !form.checkValidity()) {
             form.querySelectorAll(':invalid').forEach(element => {
                 const el = element as HTMLInputElement;
@@ -21,7 +22,8 @@ export const useForm = (callback: () => void) => {
             });
             setErrors(tempErrors);
         }
-        if (Object.keys(errors).length === 0) {
+
+        if (Object.keys(tempErrors).length === 0) {
             callback();
         }
     };
