@@ -51,6 +51,17 @@ export const Flats: React.FC = () => {
         const url = isNew ? 'flat' : `flat/${selectedFlat.id}`;
 
         // Check if values changed
+        if (!isNew) {
+            if (
+                selectedFlat.name === values.name &&
+                selectedFlat.address === values.address &&
+                Number(selectedFlat.floor) === Number(values.floor)
+            ) {
+                setLoading(false);
+                handleClose();
+                return;
+            }
+        }
 
         axios({
             method: method,
@@ -111,7 +122,45 @@ export const Flats: React.FC = () => {
         setValues({ name: selectedFlat.name, address: selectedFlat.address, floor: String(selectedFlat.floor) });
     };
     const deleteFlat = () => {
-        console.log('DELETE FLAT');
+        axios
+            .delete(`flat/${selectedFlat.id}`)
+            .then(response => {
+                setFlats(flats.filter(flt => flt.id !== selectedFlat.id));
+                setLoading(false);
+                if (flats.length) {
+                    setSelectedFlat(flats[0]);
+                } else {
+                    setSelectedFlat({ id: 0, name: '', address: '', floor: -1 });
+                }
+                AppToaster.show({
+                    intent: Intent.SUCCESS,
+                    message: 'Flat deleted successfully.',
+                });
+                handleClose();
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 400) {
+                    // JWT Token expired
+                    setLoading(false);
+                    setGlobal({ isLoggedIn: false });
+                    AppToaster.show({
+                        intent: Intent.DANGER,
+                        message: error.response.data.error,
+                    });
+                } else if (error.response && error.response.status === 409) {
+                    // Foreign Key Conflict
+                    AppToaster.show({
+                        intent: Intent.DANGER,
+                        message: error.response.data.error,
+                    });
+                } else {
+                    AppToaster.show({
+                        intent: Intent.DANGER,
+                        message: 'Fail to delete Flat',
+                    });
+                    setLoading(false);
+                }
+            });
     };
 
     const handleValueChange = (_valueAsNumber: number, valueAsString: string) => {
