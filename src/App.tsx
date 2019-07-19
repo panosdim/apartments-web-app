@@ -13,6 +13,7 @@ setGlobal({
     isLoggedIn: false,
     user: {},
     selectedFlat: {},
+    allLessees: [],
 });
 
 const App: React.FC = () => {

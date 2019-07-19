@@ -11,3 +11,13 @@ export type FlatType = {
     address: string;
     floor: number;
 };
+
+export type LesseeType = {
+    id: number;
+    name: string;
+    address: string;
+    postalCode: string;
+    from: string;
+    until: string;
+    flatId: number;
+};
