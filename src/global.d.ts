@@ -8,6 +8,7 @@ declare module 'reactn/default' {
         user: UserType;
         flats: FlatType[];
         selectedFlat: FlatType;
+        selectedLessee: LesseeType;
         allLessees: LesseeType[];
     }
 }

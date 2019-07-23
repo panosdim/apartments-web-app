@@ -13,6 +13,7 @@ setGlobal({
     isLoggedIn: false,
     user: {},
     selectedFlat: {},
+    selectedLessee: {},
     allLessees: [],
 });
 

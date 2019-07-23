@@ -27,6 +27,8 @@ export const Flats: React.FC = () => {
     const [isOpen, setOpen] = useState(false);
     const [isNew, setNew] = useState(false);
     const [isLoading, setLoading] = useState(false);
+    const { values, errors, handleChange, checkValidity, setValues, setErrors, setRef } = useForm();
+    const flatFormRef = setRef as React.Ref<HTMLFormElement>;
 
     useEffect(() => {
         axios
@@ -46,6 +48,9 @@ export const Flats: React.FC = () => {
     }, []);
 
     const handleFlat = () => {
+        if (!checkValidity()) {
+            return;
+        }
         setLoading(true);
         const method = isNew ? 'post' : 'put';
         const url = isNew ? 'flat' : `flat/${selectedFlat.id}`;
@@ -98,9 +103,6 @@ export const Flats: React.FC = () => {
                 }
             });
     };
-
-    const { values, errors, handleChange, handleSubmit, setValues, setErrors, setRef } = useForm(handleFlat);
-    const flatFormRef = setRef as React.Ref<HTMLFormElement>;
 
     const handleSelection = (flat: FlatType) => {
         setSelectedFlat(flat);
@@ -304,7 +306,7 @@ export const Flats: React.FC = () => {
                             intent={Intent.PRIMARY}
                             loading={isLoading}
                             text='Save'
-                            onClick={handleSubmit}
+                            onClick={handleFlat}
                         />
                     </div>
                 </div>

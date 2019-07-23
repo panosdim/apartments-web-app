@@ -10,6 +10,8 @@ export const LoginForm = () => {
     const [isLoading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [isAuthenticated, setAuthenticated] = useState(false);
+    const { values, errors, handleChange, checkValidity, setRef } = useForm();
+    const loginFormRef = setRef as React.Ref<HTMLFormElement>;
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -20,7 +22,11 @@ export const LoginForm = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated]);
 
-    const login = () => {
+    const login = (event: React.FormEvent) => {
+        if (event) event.preventDefault();
+        if (!checkValidity()) {
+            return;
+        }
         setLoading(true);
 
         axios
@@ -41,9 +47,6 @@ export const LoginForm = () => {
             });
     };
 
-    const { values, errors, handleChange, handleSubmit, setRef } = useForm(login);
-    const loginFormRef = setRef as React.Ref<HTMLFormElement>;
-
     const handleLockClick = () => setShowPassword(!showPassword);
 
     const lockButton = (
@@ -58,7 +61,7 @@ export const LoginForm = () => {
     );
 
     return (
-        <form onSubmit={handleSubmit} noValidate ref={loginFormRef}>
+        <form onSubmit={login} noValidate ref={loginFormRef}>
             <FormGroup
                 label='Email'
                 labelFor='email-input'

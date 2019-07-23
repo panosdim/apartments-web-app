@@ -1,12 +1,11 @@
 import { useState } from 'react';
 
-export const useForm = (callback: () => void) => {
+export const useForm = () => {
     const [values, setValues] = useState<FormData>({});
     const [errors, setErrors] = useState<FormData>({});
     const [formRef, setRef] = useState<React.Ref<HTMLFormElement>>(null);
 
-    const handleSubmit = (event: React.FormEvent) => {
-        if (event) event.preventDefault();
+    const checkValidity = (): boolean => {
         let form = (formRef as unknown) as HTMLFormElement;
         let tempErrors: FormData = {};
 
@@ -24,8 +23,10 @@ export const useForm = (callback: () => void) => {
         }
 
         if (Object.keys(tempErrors).length === 0) {
-            callback();
+            return true;
         }
+
+        return false;
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +43,7 @@ export const useForm = (callback: () => void) => {
 
     return {
         handleChange,
-        handleSubmit,
+        checkValidity,
         values,
         errors,
         setValues,
