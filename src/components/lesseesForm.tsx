@@ -5,7 +5,7 @@ import axios from 'axios';
 import { AppToaster, useForm } from '.';
 import { DateInput } from '@blueprintjs/datetime';
 import { LesseeType } from '../model';
-import { format } from './dateUtils';
+import { format, toMySQLDateString } from './dateUtils';
 
 interface Props {
     isShowing: boolean;
@@ -18,10 +18,11 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
     const { isShowing, hide, isNew, onFinish } = props;
     const [isLoading, setLoading] = useState(false);
     const [selectedLessee] = useGlobal('selectedLessee');
+    const [selectedFlat] = useGlobal('selectedFlat');
     const { values, errors, handleChange, checkValidity, setValues, setErrors, setRef } = useForm();
     const lesseeFormRef = setRef as React.Ref<HTMLFormElement>;
-    const [from, setFrom] = useState<Date | null>(null);
-    const [until, setUntil] = useState<Date | null>(null);
+    const [from, setFrom] = useState<Date | undefined>(undefined);
+    const [until, setUntil] = useState<Date | undefined>(undefined);
     const [fromError, setFromError] = useState<String | null>(null);
     const [untilError, setUntilError] = useState<String | null>(null);
     const [fromIntent, setFromIntent] = useState<Intent>(Intent.NONE);
@@ -29,25 +30,29 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
 
     useEffect(() => {
         if (isNew) {
-            setValues({ name: '', address: '', postalCode: '', from: '', until: '' });
-            setFrom(null);
-            setUntil(null);
+            setValues({ name: '', address: '', postal_code: '', from: '', until: '' });
+            setFrom(undefined);
+            setUntil(undefined);
             setErrors({});
+            setFromIntent(Intent.NONE);
+            setUntilIntent(Intent.NONE);
         } else {
             if (selectedLessee) {
                 setValues({
                     name: selectedLessee.name,
                     address: selectedLessee.address,
-                    postalCode: selectedLessee.postalCode,
+                    postal_code: selectedLessee.postal_code,
                 });
 
                 setFrom(new Date(selectedLessee.from));
                 setUntil(new Date(selectedLessee.until));
+                setFromIntent(Intent.SUCCESS);
+                setUntilIntent(Intent.SUCCESS);
             }
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedLessee, isNew]);
+    }, [selectedLessee, isNew, isShowing]);
 
     const handleSubmit = () => {
         if (!checkValidity() || !from || !until) {
@@ -66,26 +71,32 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
         setLoading(true);
         const method = isNew ? 'post' : 'put';
         const url = isNew ? 'lessee' : `lessee/${selectedLessee.id}`;
+        const data: Partial<LesseeType> = { ...values };
 
         // Check if values changed
         if (!isNew) {
             if (
                 selectedLessee.name === values.name &&
                 selectedLessee.address === values.address &&
-                selectedLessee.postalCode === values.postalCode &&
-                selectedLessee.from === values.from &&
-                selectedLessee.until === values.until
+                selectedLessee.postal_code === values.postal_code &&
+                selectedLessee.from === toMySQLDateString(from) &&
+                selectedLessee.until === toMySQLDateString(until)
             ) {
                 setLoading(false);
                 handleClose();
                 return;
             }
+        } else {
+            data.flat_id = selectedFlat.id;
         }
+
+        data.from = toMySQLDateString(from);
+        data.until = toMySQLDateString(until);
 
         axios({
             method: method,
             url: url,
-            data: values,
+            data: data,
         })
             .then(response => {
                 setLoading(false);
@@ -117,9 +128,9 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
 
     const handleClose = () => {
         hide();
-        setValues({ name: '', address: '', postalCode: '', from: '', until: '' });
-        setFrom(null);
-        setUntil(null);
+        setValues({ name: '', address: '', postal_code: '', from: '', until: '' });
+        setFrom(undefined);
+        setUntil(undefined);
         setFromError(null);
         setUntilError(null);
         setFromIntent(Intent.NONE);
@@ -181,17 +192,17 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                         label='Postal Code'
                         labelFor='postal-code-input'
                         labelInfo='(required)'
-                        helperText={errors.postalCode}
-                        intent={errors.postalCode ? Intent.DANGER : values.postalCode ? Intent.SUCCESS : Intent.NONE}
+                        helperText={errors.postal_code}
+                        intent={errors.postal_code ? Intent.DANGER : values.postal_code ? Intent.SUCCESS : Intent.NONE}
                     >
                         <InputGroup
                             id='postal-code-input'
-                            name='postalCode'
+                            name='postal_code'
                             placeholder='Postal Code'
                             onChange={handleChange}
-                            value={values.postalCode || ''}
+                            value={values.postal_code || ''}
                             intent={
-                                errors.postalCode ? Intent.DANGER : values.postalCode ? Intent.SUCCESS : Intent.NONE
+                                errors.postal_code ? Intent.DANGER : values.postal_code ? Intent.SUCCESS : Intent.NONE
                             }
                             required
                         />
@@ -206,6 +217,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                         <DateInput
                             placeholder='Rent From'
                             formatDate={format}
+                            maxDate={until}
                             onChange={selectedDate => {
                                 setFrom(selectedDate);
                                 setFromIntent(selectedDate ? Intent.SUCCESS : Intent.NONE);
@@ -226,6 +238,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                     >
                         <DateInput
                             placeholder='Rent Until'
+                            minDate={from}
                             formatDate={format}
                             onChange={selectedDate => {
                                 setUntil(selectedDate);

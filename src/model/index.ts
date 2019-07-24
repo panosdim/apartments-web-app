@@ -16,8 +16,8 @@ export type LesseeType = {
     id: number;
     name: string;
     address: string;
-    postalCode: string;
+    postal_code: string;
     from: string;
     until: string;
-    flatId: number;
+    flat_id: number;
 };

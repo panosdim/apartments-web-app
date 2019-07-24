@@ -3,7 +3,7 @@ import { Card, H3, Elevation, HTMLTable, Intent, Button, Classes, H5, Popover, P
 import { useGlobal, setGlobal } from 'reactn';
 import axios from 'axios';
 import { LesseeType } from '../model';
-import { AppToaster } from '.';
+import { AppToaster, formatMySQLDateString } from '.';
 import { Colors } from '@blueprintjs/core';
 import { LesseesForm } from './lesseesForm';
 import useModal from './useModal';
@@ -12,10 +12,10 @@ const emptyLessee = {
     id: 0,
     name: '',
     address: '',
-    postalCode: '',
+    postal_code: '',
     from: '',
     until: '',
-    flatId: -1,
+    flat_id: -1,
 };
 
 export const Lessees: React.FC = () => {
@@ -46,7 +46,7 @@ export const Lessees: React.FC = () => {
 
     useEffect(() => {
         if (selectedFlat.id) {
-            setLessees(allLessees.filter(lessee => lessee.flatId === selectedFlat.id));
+            setLessees(allLessees.filter(lessee => lessee.flat_id === selectedFlat.id));
         }
     }, [selectedFlat, allLessees]);
 
@@ -159,9 +159,9 @@ export const Lessees: React.FC = () => {
                                 >
                                     <td>{lessee.name}</td>
                                     <td>{lessee.address}</td>
-                                    <td>{lessee.postalCode}</td>
-                                    <td>{lessee.from}</td>
-                                    <td>{lessee.until}</td>
+                                    <td>{lessee.postal_code}</td>
+                                    <td>{lessee.from && formatMySQLDateString(lessee.from)}</td>
+                                    <td>{lessee.until && formatMySQLDateString(lessee.until)}</td>
                                 </tr>
                             ))}
                     </tbody>
