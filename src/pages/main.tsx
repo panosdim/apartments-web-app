@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flats, Lessees } from '../components';
+import { Flats, Lessees, Balance } from '../components';
 import { Header } from '../components/header';
 
 export const Main: React.FC = () => {
@@ -9,6 +9,9 @@ export const Main: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                 <Flats />
                 <Lessees />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <Balance />
             </div>
         </>
     );

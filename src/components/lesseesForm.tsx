@@ -187,7 +187,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                             required
                         />
                     </FormGroup>
-
+                    {/* TODO: Allow only numbers */}
                     <FormGroup
                         label='Postal Code'
                         labelFor='postal-code-input'

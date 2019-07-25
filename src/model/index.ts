@@ -21,3 +21,11 @@ export type LesseeType = {
     until: string;
     flat_id: number;
 };
+
+export type BalanceType = {
+    id: number;
+    date: string;
+    amount: number;
+    flat_id: number;
+    comment: string;
+};

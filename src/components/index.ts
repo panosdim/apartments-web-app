@@ -1,3 +1,5 @@
+export * from './balance';
+export * from './currencyUtils';
 export * from './dateUtils';
 export * from './flats';
 export * from './header';

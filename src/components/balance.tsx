@@ -2,27 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { Card, H3, Elevation, HTMLTable, Intent, Button, Classes, H5, Popover, Position } from '@blueprintjs/core';
 import { useGlobal, setGlobal } from 'reactn';
 import axios from 'axios';
-import { LesseeType } from '../model';
-import { AppToaster, formatMySQLDateString } from '.';
+import { BalanceType } from '../model';
+import { AppToaster, formatMySQLDateString, formatEuro } from '.';
 import { Colors } from '@blueprintjs/core';
-import { LesseesForm } from './lesseesForm';
 import useModal from './useModal';
 
-export const Lessees: React.FC = () => {
+export const Balance: React.FC = () => {
     const [selectedFlat] = useGlobal('selectedFlat');
-    const [allLessees, setAllLessees] = useGlobal('allLessees');
-    const [selectedLessee, setSelectedLessee] = useGlobal('selectedLessee');
+    const [allBalance, setAllBalance] = useGlobal('allBalance');
+    const [selectedBalance, setSelectedBalance] = useGlobal('selectedBalance');
 
     const [isNew, setNew] = useState(false);
     const [isLoading, setLoading] = useState(false);
-    const [lessees, setLessees] = useState<LesseeType[]>([]);
+    const [balance, setBalance] = useState<BalanceType[]>([]);
     const { isShowing, toggle } = useModal();
 
     useEffect(() => {
         axios
-            .get('lessee')
+            .get('balance')
             .then(response => {
-                setAllLessees(response.data);
+                setAllBalance(response.data);
             })
             .catch(error => {
                 AppToaster.show({
@@ -36,47 +35,49 @@ export const Lessees: React.FC = () => {
 
     useEffect(() => {
         if (selectedFlat.id) {
-            setLessees(allLessees.filter(lessee => lessee.flat_id === selectedFlat.id));
+            setBalance(
+                allBalance.filter(bal => bal.flat_id === selectedFlat.id).sort((a, b) => b.date.localeCompare(a.date)),
+            );
         }
-    }, [selectedFlat, allLessees]);
+    }, [selectedFlat, allBalance]);
 
     useEffect(() => {
-        setSelectedLessee(lessees[0]);
+        setSelectedBalance(balance[0]);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lessees]);
+    }, [balance]);
 
-    const handleSelection = (lessee: LesseeType) => {
-        setSelectedLessee(lessee);
+    const handleSelection = (balance: BalanceType) => {
+        setSelectedBalance(balance);
     };
 
-    const addLessee = () => {
+    const addBalance = () => {
         setNew(true);
         toggle();
     };
 
-    const editLessee = () => {
+    const editBalance = () => {
         setNew(false);
         toggle();
     };
 
-    const handleFinish = (lesseeData: LesseeType) => {
+    const handleFinish = (balanceData: BalanceType) => {
         isNew
-            ? setLessees([...lessees, lesseeData])
-            : setLessees(lessees.map(lessee => (lessee.id === selectedLessee.id ? lesseeData : lessee)));
+            ? setBalance([...balance, balanceData])
+            : setBalance(balance.map(bal => (bal.id === selectedBalance.id ? balanceData : bal)));
     };
 
-    const deleteLessee = () => {
+    const deleteBalance = () => {
         setLoading(true);
         axios
-            .delete(`lessee/${selectedLessee.id}`)
+            .delete(`balance/${selectedBalance.id}`)
             .then(() => {
-                setLessees(lessees.filter(lessee => lessee.id !== selectedLessee.id));
+                setBalance(balance.filter(bal => bal.id !== selectedBalance.id));
                 setLoading(false);
-                setSelectedLessee(lessees[0]);
+                setSelectedBalance(balance[0]);
 
                 AppToaster.show({
                     intent: Intent.SUCCESS,
-                    message: 'Lessee deleted successfully.',
+                    message: 'Balance deleted successfully.',
                 });
             })
             .catch(error => {
@@ -91,7 +92,7 @@ export const Lessees: React.FC = () => {
                 } else {
                     AppToaster.show({
                         intent: Intent.DANGER,
-                        message: 'Fail to delete Lessee',
+                        message: 'Fail to delete Balance',
                     });
                     setLoading(false);
                 }
@@ -101,12 +102,12 @@ export const Lessees: React.FC = () => {
     const popoverContent = (
         <div key='text'>
             <H5>Confirm deletion</H5>
-            <p>Are you sure you want to delete selected lessee? You won't be able to recover it.</p>
+            <p>Are you sure you want to delete selected balance? You won't be able to recover it.</p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 15 }}>
                 <Button className={Classes.POPOVER_DISMISS} style={{ marginRight: 10 }}>
                     Cancel
                 </Button>
-                <Button intent={Intent.DANGER} className={Classes.POPOVER_DISMISS} onClick={deleteLessee}>
+                <Button intent={Intent.DANGER} className={Classes.POPOVER_DISMISS} onClick={deleteBalance}>
                     Delete
                 </Button>
             </div>
@@ -116,41 +117,39 @@ export const Lessees: React.FC = () => {
     return (
         <>
             <Card interactive={true} elevation={Elevation.TWO} style={{ width: 'max-content', height: 'max-content' }}>
-                <H3>Lessees Management</H3>
-                <HTMLTable className={lessees ? '' : Classes.SKELETON} interactive={true} condensed={true}>
+                <H3>Balance Management</H3>
+                <HTMLTable className={balance ? '' : Classes.SKELETON} interactive={true} condensed={true}>
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Address</th>
-                            <th>Postal Code</th>
-                            <th>Rented From</th>
-                            <th>Rented Until</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Comment</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {lessees &&
-                            lessees.map(lessee => (
+                        {balance &&
+                            balance.map(bal => (
                                 <tr
-                                    key={lessee.id}
-                                    onClick={() => handleSelection(lessee)}
+                                    key={bal.id}
+                                    onClick={() => handleSelection(bal)}
                                     style={
-                                        selectedLessee && lessee.id === selectedLessee.id
+                                        selectedBalance && bal.id === selectedBalance.id
                                             ? { background: Colors.BLUE3 }
-                                            : {}
+                                            : bal.amount > 0
+                                            ? { background: Colors.GREEN3 }
+                                            : { background: Colors.RED3 }
                                     }
                                 >
-                                    <td>{lessee.name}</td>
-                                    <td>{lessee.address}</td>
-                                    <td>{lessee.postal_code}</td>
-                                    <td>{lessee.from && formatMySQLDateString(lessee.from)}</td>
-                                    <td>{lessee.until && formatMySQLDateString(lessee.until)}</td>
+                                    <td>{formatMySQLDateString(bal.date)}</td>
+                                    <td>{formatEuro(bal.amount)}</td>
+                                    <td>{bal.comment}</td>
                                 </tr>
                             ))}
                     </tbody>
                 </HTMLTable>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addLessee} />
-                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editLessee} />
+                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addBalance} />
+                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editBalance} />
                     <Popover
                         content={popoverContent}
                         popoverClassName={Classes.POPOVER_CONTENT_SIZING}
@@ -160,7 +159,6 @@ export const Lessees: React.FC = () => {
                     </Popover>
                 </div>
             </Card>
-            <LesseesForm isShowing={isShowing} isNew={isNew} hide={toggle} onFinish={handleFinish} />
         </>
     );
 };

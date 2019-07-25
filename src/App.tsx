@@ -15,6 +15,8 @@ setGlobal({
     selectedFlat: {},
     selectedLessee: {},
     allLessees: [],
+    selectedBalance: {},
+    allBalance: [],
 });
 
 const App: React.FC = () => {

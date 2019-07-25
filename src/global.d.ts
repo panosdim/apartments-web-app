@@ -10,5 +10,7 @@ declare module 'reactn/default' {
         selectedFlat: FlatType;
         selectedLessee: LesseeType;
         allLessees: LesseeType[];
+        selectedBalance: BalanceType;
+        allBalance: BalanceType[];
     }
 }

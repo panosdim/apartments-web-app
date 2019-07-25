@@ -118,12 +118,15 @@ export const Flats: React.FC = () => {
         setOpen(true);
         setNew(true);
     };
+
     const editFlat = () => {
         setOpen(true);
         setNew(false);
         setValues({ name: selectedFlat.name, address: selectedFlat.address, floor: String(selectedFlat.floor) });
     };
+
     const deleteFlat = () => {
+        setLoading(true);
         axios
             .delete(`flat/${selectedFlat.id}`)
             .then(response => {
@@ -227,7 +230,7 @@ export const Flats: React.FC = () => {
                         popoverClassName={Classes.POPOVER_CONTENT_SIZING}
                         position={Position.BOTTOM}
                     >
-                        <Button icon='trash' intent={Intent.DANGER} text='Delete' />
+                        <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
                     </Popover>
                 </div>
             </Card>
