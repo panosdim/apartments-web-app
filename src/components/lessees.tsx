@@ -3,7 +3,7 @@ import { Card, H3, Elevation, HTMLTable, Intent, Button, Classes, H5, Popover, P
 import { useGlobal, setGlobal } from 'reactn';
 import axios from 'axios';
 import { LesseeType } from '../model';
-import { AppToaster, formatMySQLDateString } from '.';
+import { AppToaster, formatMySQLDateString, toMySQLDateString } from '.';
 import { Colors } from '@blueprintjs/core';
 import { LesseesForm } from './lesseesForm';
 import useModal from './useModal';
@@ -63,6 +63,9 @@ export const Lessees: React.FC = () => {
         isNew
             ? setLessees([...lessees, lesseeData])
             : setLessees(lessees.map(lessee => (lessee.id === selectedLessee.id ? lesseeData : lessee)));
+        isNew
+            ? setAllLessees([...allLessees, lesseeData])
+            : setAllLessees(allLessees.map(lessee => (lessee.id === selectedLessee.id ? lesseeData : lessee)));
     };
 
     const deleteLessee = () => {
@@ -71,6 +74,7 @@ export const Lessees: React.FC = () => {
             .delete(`lessee/${selectedLessee.id}`)
             .then(() => {
                 setLessees(lessees.filter(lessee => lessee.id !== selectedLessee.id));
+                setAllLessees(allLessees.filter(lessee => lessee.id !== selectedLessee.id));
                 setLoading(false);
                 setSelectedLessee(lessees[0]);
 
@@ -80,9 +84,9 @@ export const Lessees: React.FC = () => {
                 });
             })
             .catch(error => {
+                setLoading(false);
                 if (error.response && error.response.status === 400) {
                     // JWT Token expired
-                    setLoading(false);
                     setGlobal({ isLoggedIn: false });
                     AppToaster.show({
                         intent: Intent.DANGER,
@@ -93,7 +97,6 @@ export const Lessees: React.FC = () => {
                         intent: Intent.DANGER,
                         message: 'Fail to delete Lessee',
                     });
-                    setLoading(false);
                 }
             });
     };
@@ -117,6 +120,17 @@ export const Lessees: React.FC = () => {
         <>
             <Card interactive={true} elevation={Elevation.TWO} style={{ width: 'max-content', height: 'max-content' }}>
                 <H3>Lessees Management</H3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addLessee} />
+                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editLessee} />
+                    <Popover
+                        content={popoverContent}
+                        popoverClassName={Classes.POPOVER_CONTENT_SIZING}
+                        position={Position.BOTTOM}
+                    >
+                        <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
+                    </Popover>
+                </div>
                 <HTMLTable className={lessees ? '' : Classes.SKELETON} interactive={true} condensed={true}>
                     <thead>
                         <tr>
@@ -136,7 +150,9 @@ export const Lessees: React.FC = () => {
                                     style={
                                         selectedLessee && lessee.id === selectedLessee.id
                                             ? { background: Colors.BLUE3 }
-                                            : {}
+                                            : lessee.until > toMySQLDateString(new Date())
+                                            ? { background: Colors.GREEN3 }
+                                            : { background: Colors.RED3 }
                                     }
                                 >
                                     <td>{lessee.name}</td>
@@ -148,17 +164,6 @@ export const Lessees: React.FC = () => {
                             ))}
                     </tbody>
                 </HTMLTable>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addLessee} />
-                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editLessee} />
-                    <Popover
-                        content={popoverContent}
-                        popoverClassName={Classes.POPOVER_CONTENT_SIZING}
-                        position={Position.BOTTOM}
-                    >
-                        <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
-                    </Popover>
-                </div>
             </Card>
             <LesseesForm isShowing={isShowing} isNew={isNew} hide={toggle} onFinish={handleFinish} />
         </>

@@ -6,6 +6,7 @@ import { BalanceType } from '../model';
 import { AppToaster, formatMySQLDateString, formatEuro } from '.';
 import { Colors } from '@blueprintjs/core';
 import useModal from './useModal';
+import { BalanceForm } from './balanceForm';
 
 export const Balance: React.FC = () => {
     const [selectedFlat] = useGlobal('selectedFlat');
@@ -42,6 +43,7 @@ export const Balance: React.FC = () => {
     }, [selectedFlat, allBalance]);
 
     useEffect(() => {
+        balance.sort((a, b) => b.date.localeCompare(a.date));
         setSelectedBalance(balance[0]);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [balance]);
@@ -64,6 +66,10 @@ export const Balance: React.FC = () => {
         isNew
             ? setBalance([...balance, balanceData])
             : setBalance(balance.map(bal => (bal.id === selectedBalance.id ? balanceData : bal)));
+
+        isNew
+            ? setAllBalance([...allBalance, balanceData])
+            : setAllBalance(allBalance.map(bal => (bal.id === selectedBalance.id ? balanceData : bal)));
     };
 
     const deleteBalance = () => {
@@ -72,6 +78,7 @@ export const Balance: React.FC = () => {
             .delete(`balance/${selectedBalance.id}`)
             .then(() => {
                 setBalance(balance.filter(bal => bal.id !== selectedBalance.id));
+                setAllBalance(allBalance.filter(bal => bal.id !== selectedBalance.id));
                 setLoading(false);
                 setSelectedBalance(balance[0]);
 
@@ -81,9 +88,9 @@ export const Balance: React.FC = () => {
                 });
             })
             .catch(error => {
+                setLoading(false);
                 if (error.response && error.response.status === 400) {
                     // JWT Token expired
-                    setLoading(false);
                     setGlobal({ isLoggedIn: false });
                     AppToaster.show({
                         intent: Intent.DANGER,
@@ -94,7 +101,6 @@ export const Balance: React.FC = () => {
                         intent: Intent.DANGER,
                         message: 'Fail to delete Balance',
                     });
-                    setLoading(false);
                 }
             });
     };
@@ -118,7 +124,17 @@ export const Balance: React.FC = () => {
         <>
             <Card interactive={true} elevation={Elevation.TWO} style={{ width: 'max-content', height: 'max-content' }}>
                 <H3>Balance Management</H3>
-
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addBalance} />
+                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editBalance} />
+                    <Popover
+                        content={popoverContent}
+                        popoverClassName={Classes.POPOVER_CONTENT_SIZING}
+                        position={Position.BOTTOM}
+                    >
+                        <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
+                    </Popover>
+                </div>
                 <HTMLTable className={balance ? '' : Classes.SKELETON} interactive={true} condensed={true}>
                     <thead>
                         <tr>
@@ -149,19 +165,8 @@ export const Balance: React.FC = () => {
                             ))}
                     </tbody>
                 </HTMLTable>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addBalance} />
-                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editBalance} />
-                    <Popover
-                        content={popoverContent}
-                        popoverClassName={Classes.POPOVER_CONTENT_SIZING}
-                        position={Position.BOTTOM}
-                    >
-                        <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
-                    </Popover>
-                </div>
             </Card>
+            <BalanceForm isShowing={isShowing} isNew={isNew} hide={toggle} onFinish={handleFinish} />
         </>
     );
 };

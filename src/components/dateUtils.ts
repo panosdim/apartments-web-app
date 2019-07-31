@@ -11,3 +11,7 @@ export const formatMySQLDateString = (date: string) => {
     const [yyyy, mm, dd] = date.split('-');
     return `${dd}-${mm}-${yyyy}`;
 };
+
+export const now: Date = new Date();
+
+export const maxDate: Date = new Date(now.getFullYear() + 4, now.getMonth(), now.getDate());

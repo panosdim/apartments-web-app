@@ -144,9 +144,9 @@ export const Flats: React.FC = () => {
                 handleClose();
             })
             .catch(error => {
+                setLoading(false);
                 if (error.response && error.response.status === 400) {
                     // JWT Token expired
-                    setLoading(false);
                     setGlobal({ isLoggedIn: false });
                     AppToaster.show({
                         intent: Intent.DANGER,
@@ -163,7 +163,6 @@ export const Flats: React.FC = () => {
                         intent: Intent.DANGER,
                         message: 'Fail to delete Flat',
                     });
-                    setLoading(false);
                 }
             });
     };
@@ -197,6 +196,17 @@ export const Flats: React.FC = () => {
         <>
             <Card interactive={true} elevation={Elevation.TWO} style={{ width: 'max-content', height: 'max-content' }}>
                 <H3>Flats Management</H3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addFlat} />
+                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editFlat} />
+                    <Popover
+                        content={popoverContent}
+                        popoverClassName={Classes.POPOVER_CONTENT_SIZING}
+                        position={Position.BOTTOM}
+                    >
+                        <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
+                    </Popover>
+                </div>
                 <HTMLTable className={flats ? '' : Classes.SKELETON} interactive={true} condensed={true}>
                     <thead>
                         <tr>
@@ -222,17 +232,6 @@ export const Flats: React.FC = () => {
                             ))}
                     </tbody>
                 </HTMLTable>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addFlat} />
-                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editFlat} />
-                    <Popover
-                        content={popoverContent}
-                        popoverClassName={Classes.POPOVER_CONTENT_SIZING}
-                        position={Position.BOTTOM}
-                    >
-                        <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
-                    </Popover>
-                </div>
             </Card>
             <Dialog
                 icon='info-sign'

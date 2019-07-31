@@ -5,7 +5,7 @@ import axios from 'axios';
 import { AppToaster, useForm } from '.';
 import { DateInput } from '@blueprintjs/datetime';
 import { LesseeType } from '../model';
-import { format, toMySQLDateString } from './dateUtils';
+import { format, toMySQLDateString, maxDate } from './dateUtils';
 
 interface Props {
     isShowing: boolean;
@@ -239,6 +239,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                         <DateInput
                             placeholder='Rent Until'
                             minDate={from}
+                            maxDate={maxDate}
                             formatDate={format}
                             onChange={selectedDate => {
                                 setUntil(selectedDate);
