@@ -118,6 +118,7 @@ export const Balance: React.FC = () => {
         <>
             <Card interactive={true} elevation={Elevation.TWO} style={{ width: 'max-content', height: 'max-content' }}>
                 <H3>Balance Management</H3>
+
                 <HTMLTable className={balance ? '' : Classes.SKELETON} interactive={true} condensed={true}>
                     <thead>
                         <tr>
@@ -126,6 +127,7 @@ export const Balance: React.FC = () => {
                             <th>Comment</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {balance &&
                             balance.map(bal => (
@@ -147,6 +149,7 @@ export const Balance: React.FC = () => {
                             ))}
                     </tbody>
                 </HTMLTable>
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
                     <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addBalance} />
                     <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editBalance} />
