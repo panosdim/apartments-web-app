@@ -5,13 +5,11 @@ import { Header } from '../components/header';
 export const Main: React.FC = () => {
     return (
         <>
-            <div style={{ display: 'flex', flexFlow: 'column', height: '100vh' }}>
+            <div style={{ display: 'flex', flexFlow: 'column', height: '100%' }}>
                 <Header />
-                <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', margin: '16px' }}>
                     <Flats />
                     <Lessees />
-                </div>
-                <div style={{ flexGrow: 1, display: 'flex', justifyContent: 'space-around', marginBottom: '16px' }}>
                     <Balance />
                 </div>
             </div>

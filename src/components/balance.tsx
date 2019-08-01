@@ -124,18 +124,7 @@ export const Balance: React.FC = () => {
         <>
             <Card interactive={true} elevation={Elevation.TWO} style={{ width: 'max-content', height: 'max-content' }}>
                 <H3>Balance Management</H3>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addBalance} />
-                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editBalance} />
-                    <Popover
-                        content={popoverContent}
-                        popoverClassName={Classes.POPOVER_CONTENT_SIZING}
-                        position={Position.BOTTOM}
-                    >
-                        <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
-                    </Popover>
-                </div>
-                <HTMLTable className={balance ? '' : Classes.SKELETON} interactive={true} condensed={true}>
+                <HTMLTable className={balance ? 'scroll' : Classes.SKELETON} interactive={true} condensed={true}>
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -165,6 +154,17 @@ export const Balance: React.FC = () => {
                             ))}
                     </tbody>
                 </HTMLTable>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+                    <Button icon='plus' intent={Intent.SUCCESS} text='Add' onClick={addBalance} />
+                    <Button icon='edit' intent={Intent.WARNING} text='Edit' onClick={editBalance} />
+                    <Popover
+                        content={popoverContent}
+                        popoverClassName={Classes.POPOVER_CONTENT_SIZING}
+                        position={Position.BOTTOM}
+                    >
+                        <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
+                    </Popover>
+                </div>
             </Card>
             <BalanceForm isShowing={isShowing} isNew={isNew} hide={toggle} onFinish={handleFinish} />
         </>

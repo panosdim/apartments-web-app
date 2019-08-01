@@ -12,7 +12,7 @@ export const Header: React.FC = () => {
     };
 
     return (
-        <Navbar style={{ marginBottom: '16px' }}>
+        <Navbar>
             <Navbar.Group align={Alignment.LEFT}>
                 <img width='32' alt='Apartments Management Logo' src={logo} />
                 <Navbar.Divider />
