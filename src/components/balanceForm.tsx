@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Intent, Button, Classes, Dialog, FormGroup, InputGroup, NumericInput } from '@blueprintjs/core';
+import {
+    Intent,
+    Button,
+    Classes,
+    Dialog,
+    FormGroup,
+    InputGroup,
+    NumericInput,
+    H5,
+    Popover,
+    Position,
+} from '@blueprintjs/core';
 import { useGlobal, setGlobal } from 'reactn';
 import axios from 'axios';
 import { AppToaster, useForm } from '.';
@@ -18,6 +29,7 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
     const { isShowing, hide, isNew, onFinish } = props;
     const [isLoading, setLoading] = useState(false);
     const [selectedBalance] = useGlobal('selectedBalance');
+    const [allBalance, setAllBalance] = useGlobal('allBalance');
     const [selectedFlat] = useGlobal('selectedFlat');
     const { values, errors, handleChange, checkValidity, setValues, setErrors, setRef } = useForm();
     const balanceFormRef = setRef as React.Ref<HTMLFormElement>;
@@ -130,6 +142,54 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
         }
     };
 
+    const deleteBalance = () => {
+        setLoading(true);
+        axios
+            .delete(`balance/${selectedBalance.id}`)
+            .then(() => {
+                setAllBalance(allBalance.filter(bal => bal.id !== selectedBalance.id));
+                setLoading(false);
+
+                AppToaster.show({
+                    intent: Intent.SUCCESS,
+                    message: 'Balance deleted successfully.',
+                });
+
+                handleClose();
+            })
+            .catch(error => {
+                setLoading(false);
+                if (error.response && error.response.status === 400) {
+                    // JWT Token expired
+                    setGlobal({ isLoggedIn: false });
+                    AppToaster.show({
+                        intent: Intent.DANGER,
+                        message: error.response.data.error,
+                    });
+                } else {
+                    AppToaster.show({
+                        intent: Intent.DANGER,
+                        message: 'Fail to delete Balance',
+                    });
+                }
+            });
+    };
+
+    const popoverContent = (
+        <div key='text'>
+            <H5>Confirm deletion</H5>
+            <p>Are you sure you want to delete selected balance? You won't be able to recover it.</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 15 }}>
+                <Button className={Classes.POPOVER_DISMISS} style={{ marginRight: 10 }}>
+                    Cancel
+                </Button>
+                <Button intent={Intent.DANGER} className={Classes.POPOVER_DISMISS} onClick={deleteBalance}>
+                    Delete
+                </Button>
+            </div>
+        </div>
+    );
+
     return (
         <Dialog
             icon='info-sign'
@@ -211,6 +271,16 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
                         text='Save'
                         onClick={handleSubmit}
                     />
+
+                    {!isNew && (
+                        <Popover
+                            content={popoverContent}
+                            popoverClassName={Classes.POPOVER_CONTENT_SIZING}
+                            position={Position.BOTTOM}
+                        >
+                            <Button icon='trash' loading={isLoading} intent={Intent.DANGER} text='Delete' />
+                        </Popover>
+                    )}
                 </div>
             </div>
         </Dialog>

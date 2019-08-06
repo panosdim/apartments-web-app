@@ -123,8 +123,7 @@ export const Dashboard: React.FC = () => {
                             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                         >
                             <XAxis dataKey='name' />
-                            //@ts-ignore
-                            <Tooltip formatter={(value: number) => chartMoneyFmt.format(value)} />
+                            <Tooltip formatter={value => chartMoneyFmt.format(Number(value))} />
                             <Line type='monotone' dataKey='savings' stroke='#8884d8' strokeWidth={2} />
                         </LineChart>
                     </ResponsiveContainer>
@@ -160,9 +159,8 @@ export const Dashboard: React.FC = () => {
                             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                         >
                             <XAxis dataKey='name' />
-                            //@ts-ignore
-                            <Tooltip formatter={(value: number) => chartMoneyFmt.format(value)} />
-                            <Line type='monotone' dataKey='savings' stroke='#8884d8' strokeWidth={2} />
+                            <Tooltip formatter={value => chartMoneyFmt.format(Number(value))} />
+                            <Line type='monotone' dataKey='savings' stroke='#428bca' strokeWidth={2} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
