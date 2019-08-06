@@ -124,7 +124,12 @@ export const Balance: React.FC = () => {
         <>
             <Card interactive={true} elevation={Elevation.TWO} style={{ width: 'max-content', height: 'max-content' }}>
                 <H3>Balance Management</H3>
-                <HTMLTable className={balance ? 'scroll' : Classes.SKELETON} interactive={true} condensed={true}>
+                <HTMLTable
+                    className={balance ? 'scroll' : Classes.SKELETON}
+                    interactive={true}
+                    condensed={true}
+                    style={{ minWidth: '450px' }}
+                >
                     <thead>
                         <tr>
                             <th>Date</th>

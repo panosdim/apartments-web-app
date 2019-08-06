@@ -5,3 +5,9 @@ export const moneyFmt = (value: number): string => {
 
     return formatter.format(value);
 };
+
+export const chartMoneyFmt = new Intl.NumberFormat('el-EL', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+});
