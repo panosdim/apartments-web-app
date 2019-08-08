@@ -5,8 +5,7 @@ import './App.css';
 import { Main, Login } from './pages';
 import { Spinner, Intent } from '@blueprintjs/core';
 
-// TODO: Change to production REST API
-axios.defaults.baseURL = 'http://localhost:8000/';
+axios.defaults.baseURL = 'https://api.flat.cc.nf/';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
 setGlobal({
