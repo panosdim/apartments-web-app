@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Intent, Button, Classes, Dialog, FormGroup, InputGroup, H5, Popover, Position } from '@blueprintjs/core';
+import {
+    Intent,
+    Button,
+    Classes,
+    Dialog,
+    FormGroup,
+    InputGroup,
+    H5,
+    Popover,
+    Position,
+    NumericInput,
+} from '@blueprintjs/core';
 import { useGlobal, setGlobal } from 'reactn';
 import axios from 'axios';
 import { AppToaster, useForm } from '.';
@@ -31,7 +42,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
 
     useEffect(() => {
         if (isNew) {
-            setValues({ name: '', address: '', postal_code: '', from: '', until: '' });
+            setValues({ name: '', address: '', postal_code: '', tin: '', rent: '', from: '', until: '' });
             setFrom(undefined);
             setUntil(undefined);
             setErrors({});
@@ -43,6 +54,8 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                     name: selectedLessee.name,
                     address: selectedLessee.address,
                     postal_code: selectedLessee.postal_code,
+                    tin: String(selectedLessee.tin),
+                    rent: String(selectedLessee.rent),
                 });
 
                 setFrom(new Date(selectedLessee.from));
@@ -80,6 +93,8 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                 selectedLessee.name === values.name &&
                 selectedLessee.address === values.address &&
                 selectedLessee.postal_code === values.postal_code &&
+                selectedLessee.tin === Number(values.tin) &&
+                selectedLessee.rent === Number(values.rent) &&
                 selectedLessee.from === toMySQLDateString(from) &&
                 selectedLessee.until === toMySQLDateString(until)
             ) {
@@ -129,7 +144,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
 
     const handleClose = () => {
         hide();
-        setValues({ name: '', address: '', postal_code: '', from: '', until: '' });
+        setValues({ name: '', address: '', postal_code: '', tin: '', rent: '', from: '', until: '' });
         setFrom(undefined);
         setUntil(undefined);
         setFromError(null);
@@ -185,6 +200,16 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
             </div>
         </div>
     );
+
+    const handleValueChange = (_valueAsNumber: number, valueAsString: string) => {
+        setValues({ ...values, rent: valueAsString });
+        if (valueAsString) {
+            let { rent: omit, ...res } = errors;
+            setErrors(res);
+        } else {
+            setErrors({ ...errors, rent: 'Please fill out this field.' });
+        }
+    };
 
     return (
         <Dialog
@@ -253,6 +278,45 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                                 errors.postal_code ? Intent.DANGER : values.postal_code ? Intent.SUCCESS : Intent.NONE
                             }
                             pattern='[0-9]{5}'
+                            required
+                        />
+                    </FormGroup>
+
+                    <FormGroup
+                        label='TIN'
+                        labelFor='tin-input'
+                        labelInfo='(required)'
+                        helperText={errors.tin}
+                        intent={errors.tin ? Intent.DANGER : values.tin ? Intent.SUCCESS : Intent.NONE}
+                    >
+                        <InputGroup
+                            id='tin-input'
+                            name='tin'
+                            placeholder='TIN'
+                            onChange={handleChange}
+                            value={values.tin || ''}
+                            intent={errors.tin ? Intent.DANGER : values.tin ? Intent.SUCCESS : Intent.NONE}
+                            pattern='[0-9]{9}'
+                            required
+                        />
+                    </FormGroup>
+
+                    <FormGroup
+                        label='Rent'
+                        labelFor='rent-input'
+                        labelInfo='(required)'
+                        helperText={errors.rent}
+                        intent={errors.rent ? Intent.DANGER : values.rent ? Intent.SUCCESS : Intent.NONE}
+                    >
+                        <NumericInput
+                            id='rent-input'
+                            name='rent'
+                            placeholder='Rent'
+                            leftIcon='euro'
+                            selectAllOnFocus={true}
+                            onValueChange={handleValueChange}
+                            value={values.rent || ''}
+                            intent={errors.rent ? Intent.DANGER : values.rent ? Intent.SUCCESS : Intent.NONE}
                             required
                         />
                     </FormGroup>

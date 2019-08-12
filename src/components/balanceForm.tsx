@@ -133,8 +133,8 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
     };
 
     const handleValueChange = (_valueAsNumber: number, valueAsString: string) => {
+        setValues({ ...values, amount: valueAsString });
         if (valueAsString) {
-            setValues({ ...values, amount: valueAsString });
             let { amount: omit, ...res } = errors;
             setErrors(res);
         } else {
@@ -236,6 +236,7 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
                             name='amount'
                             placeholder='Amount'
                             leftIcon='euro'
+                            selectAllOnFocus={true}
                             onValueChange={handleValueChange}
                             value={values.amount || ''}
                             intent={errors.amount ? Intent.DANGER : values.amount ? Intent.SUCCESS : Intent.NONE}

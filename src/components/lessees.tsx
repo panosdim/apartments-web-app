@@ -3,7 +3,7 @@ import { Card, H3, Elevation, HTMLTable, Intent, Button, Classes } from '@bluepr
 import { useGlobal } from 'reactn';
 import axios from 'axios';
 import { LesseeType } from '../model';
-import { AppToaster, formatMySQLDateString, toMySQLDateString } from '.';
+import { AppToaster, formatMySQLDateString, toMySQLDateString, chartMoneyFmt } from '.';
 import { Colors } from '@blueprintjs/core';
 import { LesseesForm } from './lesseesForm';
 import useModal from './useModal';
@@ -77,6 +77,8 @@ export const Lessees: React.FC = () => {
                             <th>Name</th>
                             <th>Address</th>
                             <th>Postal Code</th>
+                            <th>TIN</th>
+                            <th>Rent</th>
                             <th>Rented From</th>
                             <th>Rented Until</th>
                         </tr>
@@ -96,6 +98,8 @@ export const Lessees: React.FC = () => {
                                     <td>{lessee.name}</td>
                                     <td>{lessee.address}</td>
                                     <td>{lessee.postal_code}</td>
+                                    <td>{lessee.tin}</td>
+                                    <td>{chartMoneyFmt.format(lessee.rent)}</td>
                                     <td>{lessee.from && formatMySQLDateString(lessee.from)}</td>
                                     <td>{lessee.until && formatMySQLDateString(lessee.until)}</td>
                                 </tr>

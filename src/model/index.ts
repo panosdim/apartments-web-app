@@ -20,6 +20,8 @@ export type LesseeType = {
     from: string;
     until: string;
     flat_id: number;
+    rent: number;
+    tin: number;
 };
 
 export type BalanceType = {
