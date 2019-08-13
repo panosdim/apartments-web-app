@@ -69,6 +69,10 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
     }, [selectedLessee, isNew, isShowing]);
 
     const handleSubmit = () => {
+        if (errors.tin) {
+            return;
+        }
+
         if (!checkValidity() || !from || !until) {
             // Check validity of Date inputs
             if (!from) {
@@ -79,6 +83,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                 setUntilError('Please fill out this field.');
                 setUntilIntent(Intent.DANGER);
             }
+
             return;
         }
 
@@ -211,6 +216,25 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
         }
     };
 
+    const handleTINValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        handleChange(event);
+        const el = event.target;
+        if (el.validity.valid) {
+            axios
+                .get(`checkTin/${el.value}`, { timeout: 5000 })
+                .then(function(response) {
+                    // handle success
+                    if (!(response.data.validStructure && response.data.validSyntax)) {
+                        setErrors({ ...errors, [el.name]: 'TIN is not valid' });
+                    }
+                })
+                .catch(function(error) {
+                    // handle error
+                    console.log(error);
+                });
+        }
+    };
+
     return (
         <Dialog
             icon='info-sign'
@@ -293,7 +317,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                             id='tin-input'
                             name='tin'
                             placeholder='TIN'
-                            onChange={handleChange}
+                            onChange={handleTINValueChange}
                             value={values.tin || ''}
                             intent={errors.tin ? Intent.DANGER : values.tin ? Intent.SUCCESS : Intent.NONE}
                             pattern='[0-9]{9}'
