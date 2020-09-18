@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, H3, Elevation, HTMLTable, Intent, Button, Classes } from '@blueprintjs/core';
+import { Card, H3, Elevation, HTMLTable, Intent, Button, Classes, Colors } from '@blueprintjs/core';
 import { useGlobal } from 'reactn';
 import axios from 'axios';
 import { BalanceType } from '../model';
 import { AppToaster, formatMySQLDateString, formatEuro } from '.';
-import { Colors } from '@blueprintjs/core';
 import useModal from './useModal';
 import { BalanceForm } from './balanceForm';
 
@@ -20,15 +19,14 @@ export const Balance: React.FC = () => {
     useEffect(() => {
         axios
             .get('balance')
-            .then(response => {
+            .then((response) => {
                 setAllBalance(response.data);
             })
-            .catch(error => {
+            .catch((error) => {
                 AppToaster.show({
                     intent: Intent.DANGER,
                     message: 'Could not fetch lessees data from server.',
                 });
-                console.log(error);
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -36,7 +34,9 @@ export const Balance: React.FC = () => {
     useEffect(() => {
         if (selectedFlat.id) {
             setBalance(
-                allBalance.filter(bal => bal.flat_id === selectedFlat.id).sort((a, b) => b.date.localeCompare(a.date)),
+                allBalance
+                    .filter((bal) => bal.flat_id === selectedFlat.id)
+                    .sort((a, b) => b.date.localeCompare(a.date)),
             );
         }
     }, [selectedFlat, allBalance]);
@@ -61,11 +61,11 @@ export const Balance: React.FC = () => {
     const handleFinish = (balanceData: BalanceType) => {
         isNew
             ? setBalance([...balance, balanceData])
-            : setBalance(balance.map(bal => (bal.id === selectedBalance.id ? balanceData : bal)));
+            : setBalance(balance.map((bal) => (bal.id === selectedBalance.id ? balanceData : bal)));
 
         isNew
             ? setAllBalance([...allBalance, balanceData])
-            : setAllBalance(allBalance.map(bal => (bal.id === selectedBalance.id ? balanceData : bal)));
+            : setAllBalance(allBalance.map((bal) => (bal.id === selectedBalance.id ? balanceData : bal)));
     };
 
     return (
@@ -92,7 +92,7 @@ export const Balance: React.FC = () => {
 
                     <tbody>
                         {balance &&
-                            balance.map(bal => (
+                            balance.map((bal) => (
                                 <tr
                                     key={bal.id}
                                     onClick={() => handleSelection(bal)}

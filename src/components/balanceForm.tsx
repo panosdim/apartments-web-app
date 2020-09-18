@@ -34,7 +34,7 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
     const { values, errors, handleChange, checkValidity, setValues, setErrors, setRef } = useForm();
     const balanceFormRef = setRef as React.Ref<HTMLFormElement>;
     const [date, setDate] = useState<Date>(now);
-    const [dateError, setDateError] = useState<String | null>(null);
+    const [dateError, setDateError] = useState<string | null>(null);
     const [dateIntent, setDateIntent] = useState<Intent>(Intent.NONE);
 
     useEffect(() => {
@@ -91,11 +91,11 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
         data.date = toMySQLDateString(date);
 
         axios({
-            method: method,
-            url: url,
-            data: data,
+            method,
+            url,
+            data,
         })
-            .then(response => {
+            .then((response) => {
                 setLoading(false);
                 onFinish(response.data);
                 AppToaster.show({
@@ -104,7 +104,7 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
                 });
                 handleClose();
             })
-            .catch(error => {
+            .catch((error) => {
                 if (error.response && error.response.status === 400) {
                     // JWT Token expired
                     setLoading(false);
@@ -135,7 +135,7 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
     const handleValueChange = (_valueAsNumber: number, valueAsString: string) => {
         setValues({ ...values, amount: valueAsString });
         if (valueAsString) {
-            let { amount: omit, ...res } = errors;
+            const { amount: omit, ...res } = errors;
             setErrors(res);
         } else {
             setErrors({ ...errors, amount: 'Please fill out this field.' });
@@ -147,7 +147,7 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
         axios
             .delete(`balance/${selectedBalance.id}`)
             .then(() => {
-                setAllBalance(allBalance.filter(bal => bal.id !== selectedBalance.id));
+                setAllBalance(allBalance.filter((bal) => bal.id !== selectedBalance.id));
                 setLoading(false);
 
                 AppToaster.show({
@@ -157,7 +157,7 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
 
                 handleClose();
             })
-            .catch(error => {
+            .catch((error) => {
                 setLoading(false);
                 if (error.response && error.response.status === 400) {
                     // JWT Token expired
@@ -213,12 +213,12 @@ export const BalanceForm: React.FC<Props> = (props: Props) => {
                         <DateInput
                             placeholder='Date'
                             formatDate={format}
-                            onChange={selectedDate => {
+                            onChange={(selectedDate) => {
                                 setDate(selectedDate);
                                 setDateIntent(selectedDate ? Intent.SUCCESS : Intent.NONE);
                                 setDateError(null);
                             }}
-                            parseDate={str => new Date(str)}
+                            parseDate={(str) => new Date(str)}
                             inputProps={{ intent: dateIntent }}
                             value={date}
                         />

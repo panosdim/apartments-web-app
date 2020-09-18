@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, H3, Elevation, HTMLTable, Intent, Button, Classes } from '@blueprintjs/core';
+import { Card, H3, Elevation, HTMLTable, Intent, Button, Classes, Colors } from '@blueprintjs/core';
 import { useGlobal } from 'reactn';
 import axios from 'axios';
 import { LesseeType } from '../model';
 import { AppToaster, formatMySQLDateString, toMySQLDateString, chartMoneyFmt } from '.';
-import { Colors } from '@blueprintjs/core';
 import { LesseesForm } from './lesseesForm';
 import useModal from './useModal';
 
@@ -20,22 +19,21 @@ export const Lessees: React.FC = () => {
     useEffect(() => {
         axios
             .get('lessee')
-            .then(response => {
+            .then((response) => {
                 setAllLessees(response.data);
             })
-            .catch(error => {
+            .catch((error) => {
                 AppToaster.show({
                     intent: Intent.DANGER,
                     message: 'Could not fetch lessees data from server.',
                 });
-                console.log(error);
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         if (selectedFlat.id) {
-            setLessees(allLessees.filter(lessee => lessee.flat_id === selectedFlat.id));
+            setLessees(allLessees.filter((lessee) => lessee.flat_id === selectedFlat.id));
         }
     }, [selectedFlat, allLessees]);
 
@@ -58,10 +56,10 @@ export const Lessees: React.FC = () => {
     const handleFinish = (lesseeData: LesseeType) => {
         isNew
             ? setLessees([...lessees, lesseeData])
-            : setLessees(lessees.map(lessee => (lessee.id === selectedLessee.id ? lesseeData : lessee)));
+            : setLessees(lessees.map((lessee) => (lessee.id === selectedLessee.id ? lesseeData : lessee)));
         isNew
             ? setAllLessees([...allLessees, lesseeData])
-            : setAllLessees(allLessees.map(lessee => (lessee.id === selectedLessee.id ? lesseeData : lessee)));
+            : setAllLessees(allLessees.map((lessee) => (lessee.id === selectedLessee.id ? lesseeData : lessee)));
     };
 
     return (
@@ -75,9 +73,6 @@ export const Lessees: React.FC = () => {
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Address</th>
-                            <th>Postal Code</th>
-                            <th>TIN</th>
                             <th>Rent</th>
                             <th>Rented From</th>
                             <th>Rented Until</th>
@@ -85,7 +80,7 @@ export const Lessees: React.FC = () => {
                     </thead>
                     <tbody>
                         {lessees &&
-                            lessees.map(lessee => (
+                            lessees.map((lessee) => (
                                 <tr
                                     key={lessee.id}
                                     onClick={() => handleSelection(lessee)}
@@ -96,9 +91,6 @@ export const Lessees: React.FC = () => {
                                     }
                                 >
                                     <td>{lessee.name}</td>
-                                    <td>{lessee.address}</td>
-                                    <td>{lessee.postal_code}</td>
-                                    <td>{lessee.tin}</td>
                                     <td>{chartMoneyFmt.format(lessee.rent)}</td>
                                     <td>{lessee.from && formatMySQLDateString(lessee.from)}</td>
                                     <td>{lessee.until && formatMySQLDateString(lessee.until)}</td>

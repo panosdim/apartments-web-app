@@ -35,10 +35,12 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
     const lesseeFormRef = setRef as React.Ref<HTMLFormElement>;
     const [from, setFrom] = useState<Date | undefined>(undefined);
     const [until, setUntil] = useState<Date | undefined>(undefined);
-    const [fromError, setFromError] = useState<String | null>(null);
-    const [untilError, setUntilError] = useState<String | null>(null);
+    const [fromError, setFromError] = useState<string | null>(null);
+    const [untilError, setUntilError] = useState<string | null>(null);
     const [fromIntent, setFromIntent] = useState<Intent>(Intent.NONE);
     const [untilIntent, setUntilIntent] = useState<Intent>(Intent.NONE);
+
+    const errorMsg = 'Please fill out this field.';
 
     useEffect(() => {
         if (isNew) {
@@ -76,11 +78,11 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
         if (!checkValidity() || !from || !until) {
             // Check validity of Date inputs
             if (!from) {
-                setFromError('Please fill out this field.');
+                setFromError(errorMsg);
                 setFromIntent(Intent.DANGER);
             }
             if (!until) {
-                setUntilError('Please fill out this field.');
+                setUntilError(errorMsg);
                 setUntilIntent(Intent.DANGER);
             }
 
@@ -115,11 +117,11 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
         data.until = toMySQLDateString(until);
 
         axios({
-            method: method,
-            url: url,
-            data: data,
+            method,
+            url,
+            data,
         })
-            .then(response => {
+            .then((response) => {
                 setLoading(false);
                 onFinish(response.data);
                 AppToaster.show({
@@ -128,7 +130,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                 });
                 handleClose();
             })
-            .catch(error => {
+            .catch((error) => {
                 if (error.response && error.response.status === 400) {
                     // JWT Token expired
                     setLoading(false);
@@ -164,7 +166,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
         axios
             .delete(`lessee/${selectedLessee.id}`)
             .then(() => {
-                setAllLessees(allLessees.filter(lessee => lessee.id !== selectedLessee.id));
+                setAllLessees(allLessees.filter((lessee) => lessee.id !== selectedLessee.id));
                 setLoading(false);
 
                 AppToaster.show({
@@ -173,7 +175,7 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                 });
                 handleClose();
             })
-            .catch(error => {
+            .catch((error) => {
                 setLoading(false);
                 if (error.response && error.response.status === 400) {
                     // JWT Token expired
@@ -209,10 +211,10 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
     const handleValueChange = (_valueAsNumber: number, valueAsString: string) => {
         setValues({ ...values, rent: valueAsString });
         if (valueAsString) {
-            let { rent: omit, ...res } = errors;
+            const { rent: omit, ...res } = errors;
             setErrors(res);
         } else {
-            setErrors({ ...errors, rent: 'Please fill out this field.' });
+            setErrors({ ...errors, rent: errorMsg });
         }
     };
 
@@ -220,18 +222,12 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
         handleChange(event);
         const el = event.target;
         if (el.validity.valid) {
-            axios
-                .get(`checkTin/${el.value}`, { timeout: 5000 })
-                .then(function(response) {
-                    // handle success
-                    if (!(response.data.validStructure && response.data.validSyntax)) {
-                        setErrors({ ...errors, [el.name]: 'TIN is not valid' });
-                    }
-                })
-                .catch(function(error) {
-                    // handle error
-                    console.log(error);
-                });
+            axios.get(`checkTin/${el.value}`, { timeout: 5000 }).then(function (response) {
+                // handle success
+                if (!(response.data.validStructure && response.data.validSyntax)) {
+                    setErrors({ ...errors, [el.name]: 'TIN is not valid' });
+                }
+            });
         }
     };
 
@@ -355,12 +351,12 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                             placeholder='Rent From'
                             formatDate={format}
                             maxDate={until}
-                            onChange={selectedDate => {
+                            onChange={(selectedDate) => {
                                 setFrom(selectedDate);
                                 setFromIntent(selectedDate ? Intent.SUCCESS : Intent.NONE);
                                 setFromError(null);
                             }}
-                            parseDate={str => new Date(str)}
+                            parseDate={(str) => new Date(str)}
                             inputProps={{ intent: fromIntent }}
                             value={from}
                         />
@@ -378,13 +374,13 @@ export const LesseesForm: React.FC<Props> = (props: Props) => {
                             minDate={from}
                             maxDate={maxDate}
                             formatDate={format}
-                            onChange={selectedDate => {
+                            onChange={(selectedDate) => {
                                 setUntil(selectedDate);
                                 setUntilIntent(selectedDate ? Intent.SUCCESS : Intent.NONE);
                                 setUntilError(null);
                             }}
                             inputProps={{ intent: untilIntent }}
-                            parseDate={str => new Date(str)}
+                            parseDate={(str) => new Date(str)}
                             value={until}
                         />
                     </FormGroup>
